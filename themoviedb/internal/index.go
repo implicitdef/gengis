@@ -9,8 +9,8 @@ import (
 	"log"
 	"fmt"
 	"github.com/mtailor/gengis/myerrors"
-	"github.com/mtailor/gengis/vendor/github.com/cenkalti/backoff"
 	"time"
+	"github.com/mtailor/gengis/vendor/_nuts/github.com/cenkalti/backoff"
 )
 
 func BuildUrl(mainPath string) string {
