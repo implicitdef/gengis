@@ -3,12 +3,14 @@ package main
 import (
 	"github.com/mtailor/gengis/datalayer"
 	"log"
+	"fmt"
+	"github.com/mtailor/gengis/vendor/github.com/cenkalti/backoff"
 )
 
 
 
 func main() {
-	//TODO find a way to be more tolerant with themoviedb limits : caching ? throttling ? retry ?
+	//TODO implement backoff ?
 	//TODO parallelize calls to the movie db ?
 
 	seasonDisplays := datalayer.GetSeasonsDisplayForYear(2015)
