@@ -12,9 +12,9 @@ type season struct {
 	SeasonNumber int `json:"season_number"`
 }
 
-func Get(tvShowId string) ([]int, error) {
+func Get(tvShowId int) ([]int, error) {
 	tvs := tvshow{}
-	_url := fmt.Sprintf("/tv/%s", tvShowId)
+	_url := fmt.Sprintf("/tv/%d", tvShowId)
 	err := internal.DoGetAndJsonUnmarshall(_url, &tvs)
 	if err != nil {
 		return nil, err

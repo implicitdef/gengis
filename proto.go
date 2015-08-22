@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/mtailor/gengis/themoviedb"
+	"github.com/mtailor/gengis/datalayer"
 )
 
 
 
 func main() {
-
-	fmt.Println(themoviedb.GetSeasonsNumbers("1399"))
-	fmt.Println(themoviedb.GetSeasonTimeRange("1399", 5))
+	//TODO fault tolerance on bad error codes from themoviedb
+	//TODO find a way to be more tolerant with themoviedb limits : caching ? throttling ? retry ?
+	//TODO parallelize calls to the movie db ?
+	fmt.Println(datalayer.GetSeasonsDisplayForYear(2015))
 }
 

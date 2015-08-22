@@ -3,10 +3,12 @@ package internal
 import (
 	"github.com/mtailor/gengis/config"
 	"net/url"
-	"fmt"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
+	"log"
+	"errors"
+	"fmt"
 )
 
 func BuildUrl(mainPath string) string {
@@ -21,14 +23,23 @@ func BuildUrl(mainPath string) string {
 	return u.String()
 }
 
+func isGoodStatusCode(response *http.Response) bool {
+	return response.StatusCode >= 200 &&
+		response.StatusCode < 300
+}
+
+
 func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 	_url := BuildUrl(urlCore)
-	fmt.Println(">>> GET", _url)
+	log.Println(">>> GET", _url)
 	response, err := http.Get(_url)
 	if err != nil {
 		return err
 	}
 	defer response.Body.Close()
+	if ! isGoodStatusCode(response) {
+		return errors.New(fmt.Sprintf("Received status code %d", response.StatusCode))
+	}
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return err
