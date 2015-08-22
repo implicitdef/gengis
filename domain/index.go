@@ -7,8 +7,8 @@ import (
 
 
 type TimeRange struct {
-	Start time.Time
-	End time.Time
+	Start time.Time `json:"start"`
+	End time.Time `json:"end"`
 }
 
 func (tr TimeRange) String() string {

@@ -4,50 +4,37 @@ import (
 	"net/http"
 	"fmt"
 	"encoding/json"
+	"github.com/mtailor/gengis/vendor/_nuts/github.com/gorilla/mux"
+	"strconv"
+	"github.com/mtailor/gengis/datalayer"
 )
-
-type todo struct {
-	Name      string    `json:"name"`
-	Completed bool      `json:"completed"`
-}
-
-
-
-func bindHelloEndpoint() {
-	http.HandleFunc("/hello", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintln(writer, "Gengis salutes you")
-	})
-}
-
-func bindJsonSampleEndpoint(){
-	http.HandleFunc("/jsonSample", func(writer http.ResponseWriter, request *http.Request){
-		writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		writer.Write(getJsonBytes())
-	})
-}
-
-func serve(){
-	http.ListenAndServe(":8080", nil)
-}
-
-func getJsonBytes() []byte {
-	data := []todo{
-		todo{Name: "Write presentation"},
-		todo{Name: "Host meetup"},
-	}
-	jsonBytes, _ := json.Marshal(data)
-	return jsonBytes
-}
 
 
 func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintln(writer, "Gengis salutes you")
+	})
+	r.HandleFunc("/seasons/{year}", func(writer http.ResponseWriter, request *http.Request){
+		yearStr := mux.Vars(request)["year"]
+		year, err := strconv.Atoi(yearStr)
+		if err != nil {
+			fmt.Printf("Received invalid year %s", year)
+			writer.WriteHeader(http.StatusBadRequest)
+			writer.Write([]byte("Invalid year"))
+		} else {
+			data := datalayer.GetSeasonsDisplayForYear(year)
+			bytes, err := json.MarshalIndent(data, "", "  ")
+			if err != nil {
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte("Internal server error"))
+			} else {
+				writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+				writer.Write(bytes)
+			}
+		}
 
-
-	fmt.Println("We got the following json", string(getJsonBytes()))
-
-
-	bindHelloEndpoint()
-	bindJsonSampleEndpoint()
-	fmt.Println("Listening...")
-	serve()
+	})
+	http.Handle("/", r)
+	http.ListenAndServe(":8080", nil)
 }

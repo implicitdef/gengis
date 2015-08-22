@@ -29,10 +29,10 @@ var seriesTitleById = []serieBaseInfo{
 	serieBaseInfo{1421, "Modern Family"}}
 
 type SeasonDisplay struct {
-	SerieId int
-	SerieTitle string
-	SeasonNumber int
-	SeasonTimeRange domain.TimeRange
+	SerieId int `json:"serieId"`
+	SerieTitle string `json:"serieTitle"`
+	SeasonNumber int `json:"seasonNumber"`
+	SeasonTimeRange domain.TimeRange `json:"seasonTimeRange"`
 }
 
 
