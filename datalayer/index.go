@@ -2,26 +2,31 @@ package datalayer
 import (
 	"github.com/mtailor/gengis/domain"
 	"github.com/mtailor/gengis/themoviedb"
-	"github.com/mtailor/gengis/myerrors"
 	"log"
 )
 
-var seriesTitleById = map[int]string{
-	1399:   "Game of Thrones",
-	40008:  "Hannibal",
-	46648:  "True detective",
-	1402:   "Walking dead",
-	62560:  "Mr Robot",
-	61664:  "Sense 8",
-	60948:  "12 Monkeys",
-	60708:  "Gotham",
-	1412:   "Arrow",
-	62822:  "Humans",
-	61889:  "Daredevil",
-	62823:  "Scream",
-	47640:  "The Strain",
-	1413:   "American Horror Story",
-	1421:   "Modern Family"}
+type serieBaseInfo struct {
+	id int
+	title string
+}
+
+
+var seriesTitleById = []serieBaseInfo{
+	serieBaseInfo{1399, "Game of Thrones"},
+	serieBaseInfo{40008, "Hannibal"},
+	serieBaseInfo{46648, "True detective"},
+	serieBaseInfo{1402, "Walking dead"},
+	serieBaseInfo{62560, "Mr Robot"},
+	serieBaseInfo{61664, "Sense 8"},
+	serieBaseInfo{60948, "12 Monkeys"},
+	serieBaseInfo{60708, "Gotham"},
+	serieBaseInfo{1412, "Arrow"},
+	serieBaseInfo{62822, "Humans"},
+	serieBaseInfo{61889, "Daredevil"},
+	serieBaseInfo{62823, "Scream"},
+	serieBaseInfo{47640, "The Strain"},
+	serieBaseInfo{1413, "American Horror Story"},
+	serieBaseInfo{1421, "Modern Family"}}
 
 type SeasonDisplay struct {
 	SerieId int
@@ -36,34 +41,48 @@ func isSeasonDisplayInYear(year int, sd SeasonDisplay) bool {
 		sd.SeasonTimeRange.End.Year() >= year
 }
 
-func GetSeasonsDisplayForYear(year int) ([]SeasonDisplay, error) {
+func isSeasonNumberToKeep(seasonNumber int) bool {
+	// some series have a some kind of season 0
+	// that is irrelevant
+	return seasonNumber > 0
+}
+
+
+// This method swallows all error (just log them)
+// to be fault tolerant
+func fetchAndAppendSeasonDisplay(
+	seasonsDisplays []SeasonDisplay,
+	year int,
+	serie serieBaseInfo,
+	seasonNumber int) []SeasonDisplay {
+	tr, err := themoviedb.GetSeasonTimeRange(serie.id, seasonNumber)
+	// log but keep on
+	if err != nil {
+		log.Printf("Error %v", err)
+		return seasonsDisplays
+	}
+	seasonDisplay := SeasonDisplay{serie.id, serie.title, seasonNumber, tr}
+	if isSeasonDisplayInYear(year, seasonDisplay){
+		seasonsDisplays = append(seasonsDisplays, seasonDisplay)
+	}
+	return seasonsDisplays
+}
+
+
+func GetSeasonsDisplayForYear(year int) []SeasonDisplay {
 	seasonsDisplays := []SeasonDisplay{}
-	// TODO parallelize
-	for id, title := range seriesTitleById {
-		log.Printf("- %s :", title)
-		seasonsNumbers, err := themoviedb.GetSeasonsNumbers(id)
+	for _, serie := range seriesTitleById {
+		seasonsNumbers, err := themoviedb.GetSeasonsNumbers(serie.id)
 		if err != nil {
-			return nil, err
-		}
-		for _, seasonNumber := range seasonsNumbers {
-			log.Printf("  - %s S%02d", title, seasonNumber)
-			tr, err := themoviedb.GetSeasonTimeRange(id, seasonNumber)
-			if err != nil {
-				if _, ok := err.(*myerrors.UnprocessableSeasonError); ok {
-					log.Printf("    - ignored : " + err.Error())
-				} else {
-					return nil, err
-				}
-			} else {
-				seasonDisplay := SeasonDisplay{id, title, seasonNumber,	tr}
-				if isSeasonDisplayInYear(year, seasonDisplay){
-					seasonsDisplays = append(seasonsDisplays, seasonDisplay)
-					log.Printf("    - OK !")
-				} else {
-					log.Printf("    - not in the year")
+			// log but keep on
+			log.Printf("Error %v", err)
+		} else {
+			for _, seasonNumber := range seasonsNumbers {
+				if isSeasonNumberToKeep(seasonNumber) {
+					seasonsDisplays = fetchAndAppendSeasonDisplay(seasonsDisplays, year, serie, seasonNumber)
 				}
 			}
 		}
 	}
-	return seasonsDisplays, nil
+	return seasonsDisplays
 }

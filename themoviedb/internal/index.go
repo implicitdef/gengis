@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"log"
-	"errors"
 	"fmt"
+	"github.com/mtailor/gengis/myerrors"
 )
 
 func BuildUrl(mainPath string) string {
@@ -23,9 +23,16 @@ func BuildUrl(mainPath string) string {
 	return u.String()
 }
 
-func isGoodStatusCode(response *http.Response) bool {
-	return response.StatusCode >= 200 &&
-		response.StatusCode < 300
+func checkStatusCode(response *http.Response) error {
+	c := response.StatusCode
+	if c >= 200 && c < 300 {
+		return nil
+	}
+	msg := fmt.Sprintf("Received %d from TheMovieDb", c)
+	if c == 429 {
+		return &myerrors.TooManyRequestsError{msg}
+	}
+	return &myerrors.OtherTheMovieDbError{msg}
 }
 
 
@@ -37,8 +44,8 @@ func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 		return err
 	}
 	defer response.Body.Close()
-	if ! isGoodStatusCode(response) {
-		return errors.New(fmt.Sprintf("Received status code %d", response.StatusCode))
+	if err := checkStatusCode(response); err != nil {
+		return err
 	}
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
