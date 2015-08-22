@@ -1,16 +1,15 @@
-package themoviedb
+package internal
 
 import (
-	"net/url"
 	"github.com/mtailor/gengis/config"
+	"net/url"
+	"fmt"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
-	"fmt"
 )
 
-
-func buildUrl(mainPath string) string {
+func BuildUrl(mainPath string) string {
 	u, err := url.Parse("https://api.themoviedb.org/3")
 	if err != nil {
 		panic(err)
@@ -22,8 +21,8 @@ func buildUrl(mainPath string) string {
 	return u.String()
 }
 
-func doGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
-	_url := buildUrl(urlCore)
+func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
+	_url := BuildUrl(urlCore)
 	fmt.Println(">>> GET", _url)
 	response, err := http.Get(_url)
 	if err != nil {
