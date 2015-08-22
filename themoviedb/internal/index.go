@@ -9,6 +9,8 @@ import (
 	"log"
 	"fmt"
 	"github.com/mtailor/gengis/myerrors"
+	"github.com/mtailor/gengis/vendor/github.com/cenkalti/backoff"
+	"time"
 )
 
 func BuildUrl(mainPath string) string {
@@ -36,20 +38,32 @@ func checkStatusCode(response *http.Response) error {
 }
 
 
+func getBackOff() *backoff.ExponentialBackOff {
+	b := backoff.NewExponentialBackOff()
+	b.MaxElapsedTime = 10 * time.Second
+	return b
+}
+
 func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 	_url := BuildUrl(urlCore)
-	log.Println(">>> GET", _url)
-	response, err := http.Get(_url)
-	if err != nil {
-		return err
+	operation := func() error {
+		log.Println(">>> GET", _url)
+		response, err := http.Get(_url)
+		if err != nil {
+			return err
+		}
+		defer response.Body.Close()
+		if err := checkStatusCode(response); err != nil {
+			return err
+		}
+		bytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(bytes, dest)
 	}
-	defer response.Body.Close()
-	if err := checkStatusCode(response); err != nil {
-		return err
-	}
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(bytes, dest)
+	return backoff.Retry(operation, getBackOff())
 }
+
+
+
