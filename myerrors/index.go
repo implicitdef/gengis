@@ -1,6 +1,13 @@
 package myerrors
 
 
+type NotInCacheError struct {
+	Msg string
+}
+func (e *NotInCacheError) Error() string {
+	return e.Msg
+}
+
 type OtherTheMovieDbError struct {
 	Msg string
 }
