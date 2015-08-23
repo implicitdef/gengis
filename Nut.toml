@@ -9,3 +9,4 @@ authors = ["Me <me@example.com>"]
 
 "github.com/cenkalti/backoff" = "4dc77674aceaabba2c7e3da25d4c823edfb73f99"
 "github.com/gorilla/mux" = "ee1815431e497d3850809578c93ab6705f1a19f7"
+"gopkg.in/redis.v3" = ""
