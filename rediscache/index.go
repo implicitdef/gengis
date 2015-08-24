@@ -1,4 +1,4 @@
-package cache
+package rediscache
 import (
 	"github.com/mtailor/gengis/vendor/_nuts/gopkg.in/redis.v3"
 	"encoding/json"
@@ -26,7 +26,7 @@ func Set(key string, value interface{}) error {
 	if err != nil {
 		return err
 	}
-	duration := (myrandom.Generator.Intn(10) + 10) * time.Hour
+	duration := time.Duration((myrandom.Generator.Intn(10) + 10)) * time.Hour
 	return client.Set(prefix + key, bytes, duration).Err()
 }
 
@@ -37,7 +37,7 @@ func Get(key string, dest interface{}) error {
 	res := client.Get(prefix + key)
 	bytes, err := res.Bytes()
 	if err == redis.Nil {
-		return myerrors.NotInCacheError{"The key " + key + " was not cached"}
+		return &myerrors.NotInCacheError{"The key " + key + " was not cached"}
 	}
 	if err != nil {
 		return err
