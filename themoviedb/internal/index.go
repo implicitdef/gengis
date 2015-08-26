@@ -11,6 +11,7 @@ import (
 	"github.com/mtailor/gengis/myerrors"
 	"time"
 	"github.com/mtailor/gengis/vendor/_nuts/github.com/cenkalti/backoff"
+	"github.com/mtailor/gengis/rediscache"
 )
 
 func BuildUrl(mainPath string) string {
@@ -46,6 +47,12 @@ func getBackOff() *backoff.ExponentialBackOff {
 
 func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 	_url := BuildUrl(urlCore)
+	cacheKey := "themoviedb:" + urlCore
+	err := rediscache.Get(cacheKey, dest);
+	if err == nil {
+		// cache worked
+		return nil;
+	}
 	operation := func() error {
 		log.Println(">>> GET", _url)
 		response, err := http.Get(_url)
@@ -62,7 +69,12 @@ func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 		}
 		return json.Unmarshal(bytes, dest)
 	}
-	return backoff.Retry(operation, getBackOff())
+	err = backoff.Retry(operation, getBackOff())
+	if err == nil {
+		// success, let's put it in the cache
+		rediscache.Set(cacheKey, dest)
+	}
+	return err;
 }
 
 
