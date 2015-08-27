@@ -17,6 +17,7 @@ func main() {
 	})
 	r.HandleFunc("/seasons/{year}", func(writer http.ResponseWriter, request *http.Request){
 		yearStr := mux.Vars(request)["year"]
+		writer.Header().Set("Access-Control-Allow-Origin", "*")
 		year, err := strconv.Atoi(yearStr)
 		if err != nil {
 			fmt.Printf("Received invalid year %s", year)
@@ -36,5 +37,5 @@ func main() {
 
 	})
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":3000", nil)
 }
