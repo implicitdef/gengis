@@ -15,6 +15,7 @@ var seriesTitleById = []serieBaseInfo{
 	serieBaseInfo{1399, "Game of Thrones"},
 	serieBaseInfo{40008, "Hannibal"},
 	serieBaseInfo{46648, "True detective"},
+	serieBaseInfo{43082, "Key and Peele"},
 	serieBaseInfo{1402, "Walking dead"},
 	serieBaseInfo{62560, "Mr Robot"},
 	serieBaseInfo{61664, "Sense 8"},
