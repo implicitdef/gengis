@@ -1,6 +1,6 @@
 package rediscache
 import (
-	"github.com/mtailor/gengis/vendor/_nuts/gopkg.in/redis.v3"
+	"gopkg.in/redis.v3"
 	"encoding/json"
 	"time"
 	"github.com/mtailor/gengis/myrandom"

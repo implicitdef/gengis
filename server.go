@@ -1,21 +1,20 @@
 package main
 
 import (
-	"net/http"
-	"fmt"
 	"encoding/json"
-	"github.com/mtailor/gengis/vendor/_nuts/github.com/gorilla/mux"
-	"strconv"
+	"fmt"
+	"github.com/mtailor/gengis/Godeps/_workspace/src/github.com/gorilla/mux"
 	"github.com/mtailor/gengis/datalayer"
+	"net/http"
+	"strconv"
 )
-
 
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(writer, "Gengis salutes you")
 	})
-	r.HandleFunc("/seasons/{year}", func(writer http.ResponseWriter, request *http.Request){
+	r.HandleFunc("/seasons/{year}", func(writer http.ResponseWriter, request *http.Request) {
 		yearStr := mux.Vars(request)["year"]
 		writer.Header().Set("Access-Control-Allow-Origin", "*")
 		year, err := strconv.Atoi(yearStr)
@@ -37,5 +36,6 @@ func main() {
 
 	})
 	http.Handle("/", r)
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("Running...")
+	http.ListenAndServe(":8080", nil)
 }

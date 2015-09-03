@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"github.com/mtailor/gengis/myerrors"
 	"time"
-	"github.com/mtailor/gengis/vendor/_nuts/github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff"
 	"github.com/mtailor/gengis/rediscache"
 )
 
