@@ -10,10 +10,11 @@ import (
 
 const prefix = "cache:"
 
+var host, pwd = config.GetRedisHostAndPassword()
 
 var client = redis.NewClient(&redis.Options{
-	Addr: config.Get("REDIS_URL"),
-	Password: "",
+	Addr: host,
+	Password: pwd,
 	DB : 0,
 })
 
