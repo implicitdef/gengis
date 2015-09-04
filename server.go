@@ -41,6 +41,6 @@ func main() {
 	r.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.FileServer(http.Dir("public"))))
 	http.Handle("/", r)
 	port := config.Get("PORT")
-	fmt.Printf("Running on port %d...", port)
+	fmt.Printf("Running on port %s...", port)
 	http.ListenAndServe(":" + port, nil)
 }
