@@ -7,10 +7,16 @@ import (
 	"github.com/mtailor/gengis/datalayer"
 	"net/http"
 	"strconv"
+	"os"
+	"log"
 )
 
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(writer, "Gengis salutes you")
@@ -39,6 +45,6 @@ func main() {
 	const staticPrefix = "/static/"
 	r.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.FileServer(http.Dir("public"))))
 	http.Handle("/", r)
-	fmt.Println("Running...")
-	http.ListenAndServe(":8080", nil)
+	fmt.Printf("Running on port %d...", port)
+	http.ListenAndServe(":" + port, nil)
 }
