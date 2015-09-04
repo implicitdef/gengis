@@ -5,19 +5,20 @@ import (
 	"time"
 	"github.com/mtailor/gengis/myrandom"
 	"github.com/mtailor/gengis/myerrors"
+	"github.com/mtailor/gengis/config"
 )
 
 const prefix = "cache:"
 
+
 var client = redis.NewClient(&redis.Options{
-	Addr:	"localhost:6379",
+	Addr: config.Get("REDIS_URL"),
 	Password: "",
 	DB : 0,
 })
 
 // This packages assumes the given values are perfectly
 // marshable/unmarshable in JSON (so no unexported fields...)
-
 
 // marshalles the value and puts it in this key
 // will expire automatically after an arbitrary time
