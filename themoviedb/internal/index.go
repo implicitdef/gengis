@@ -48,10 +48,14 @@ func getBackOff() *backoff.ExponentialBackOff {
 func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 	_url := BuildUrl(urlCore)
 	cacheKey := "themoviedb:" + urlCore
-	err := rediscache.Get(cacheKey, dest);
+	err := rediscache.Get(cacheKey, dest)
 	if err == nil {
 		// cache worked
 		return nil;
+	}
+	if otherErr, ok := err.(*myerrors.NotInCacheError); !ok {
+		// log the problem with redis, but keep going
+		log.Println("Failed when interrogating Redis", otherErr)
 	}
 	operation := func() error {
 		log.Println(">>> GET", _url)
@@ -72,7 +76,12 @@ func DoGetAndJsonUnmarshall(urlCore string, dest interface{}) error {
 	err = backoff.Retry(operation, getBackOff())
 	if err == nil {
 		// success, let's put it in the cache
-		rediscache.Set(cacheKey, dest)
+		err = rediscache.Set(cacheKey, dest)
+		if err != nil {
+			// log the problem with redis, but keep going
+			log.Println("Failed when interrogating Redis", err)
+			return nil
+		}
 	}
 	return err;
 }
