@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
@@ -35,6 +36,8 @@ func main() {
 		}
 
 	})
+	const staticPrefix = "/static/"
+	r.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.FileServer(http.Dir("public"))))
 	http.Handle("/", r)
 	fmt.Println("Running...")
 	http.ListenAndServe(":8080", nil)
