@@ -22,6 +22,7 @@ var seriesTitleById = []serieBaseInfo{
 	serieBaseInfo{60948, "12 Monkeys"},
 	serieBaseInfo{60708, "Gotham"},
 	serieBaseInfo{1412, "Arrow"},
+	serieBaseInfo{283587, "Beasts of No Nation"},
 	serieBaseInfo{62822, "Humans"},
 	serieBaseInfo{61889, "Daredevil"},
 	serieBaseInfo{62823, "Scream"},
